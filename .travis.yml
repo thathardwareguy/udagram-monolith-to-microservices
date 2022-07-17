@@ -1,0 +1,29 @@
+language: node_js
+node_js:
+  - 12
+
+services:
+  - docker
+
+before_install: []
+
+install:
+  - sudo apt-get install awscli
+  - mkdir ${HOME}/.aws
+  
+before_script: []
+
+script:
+  - docker --version
+  - docker build -f udagram-api-feed/Dockerfile -t  thathardwareguy/udagram-api-feed:v1 udagram-api-feed
+  - docker build -f udagram-api-user/Dockerfile -t  thathardwareguy/udagram-api-user:v1 udagram-api-user
+  - docker build -f udagram-frontend/Dockerfile -t  thathardwareguy/udagram-frontend:v1 udagram-frontend
+  - docker build -f udagram-reverseproxy/Dockerfile -t  thathardwareguy/udagram-reverseproxy:v1 udagram-reverseproxy
+
+
+after_success:
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+  - docker push thathardwareguy/udagram-api-feed:v1
+  - docker push thathardwareguy/udagram-api-user:v1
+  - docker push thathardwareguy/udagram-frontend:v1
+  - docker push thathardwareguy/udagram-reverseproxy:v1
